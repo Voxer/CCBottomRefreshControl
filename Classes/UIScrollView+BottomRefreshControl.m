@@ -172,6 +172,11 @@ const CGFloat kMinRefershTime = 0.5;
         self.brc_context.refreshed = NO;
 }
 
+- (BOOL) brc_isFlippedVertically
+{
+    return CGAffineTransformEqualToTransform(self.transform, CGAffineTransformMakeScale(1.0f, -1.0f));
+}
+
 - (void)brc_checkRefreshingTimeAndPerformBlock:(void (^)())block {
 
     NSDate *date = self.brc_context.beginRefreshingDate;
@@ -196,14 +201,21 @@ const CGFloat kMinRefershTime = 0.5;
     [tableView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.and.right.equalTo(self);
         make.height.equalTo(@(kStartRefreshContentOffset));
-        make.bottom.equalTo(self).offset(-self.contentInset.bottom);
+
+        if (self.brc_isFlippedVertically)
+            make.top.equalTo(self).offset(self.contentInset.bottom);
+        else
+            make.bottom.equalTo(self).offset(-self.contentInset.bottom);
     }];
 }
 
 - (void)updateConstraints {
 
     [self.brc_context.fakeTableView mas_updateConstraints:^(MASConstraintMaker *make) {
-        make.bottom.equalTo(self).offset(-self.contentInset.bottom);
+        if (self.brc_isFlippedVertically)
+            make.top.equalTo(self).offset(self.contentInset.bottom);
+        else
+            make.bottom.equalTo(self).offset(-self.contentInset.bottom);
     }];
 
     [super updateConstraints];
@@ -237,7 +249,7 @@ const CGFloat kMinRefershTime = 0.5;
         
         [self.brc_context.fakeTableView removeFromSuperview];
         
-        self.brc_context = 0;
+        self.brc_context = nil;
     }
     
     if (refreshControl) {
@@ -249,7 +261,9 @@ const CGFloat kMinRefershTime = 0.5;
         tableView.userInteractionEnabled = NO;
         tableView.backgroundColor = [UIColor clearColor];
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        tableView.transform = CGAffineTransformMakeRotation(M_PI);
+
+        if (!self.brc_isFlippedVertically)
+            tableView.transform = CGAffineTransformMakeRotation(M_PI);
 
         refreshControl.brc_manualEndRefreshing = YES;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(brc_didEndRefreshing) name:kRefrehControllerEndRefreshingNotification object:refreshControl];
