@@ -166,7 +166,7 @@ const CGFloat kMinRefershTime = 0.5;
 
     CGFloat offset = (contentOffset.y + contentInset.top + height) - MAX((self.contentSize.height + contentInset.bottom + contentInset.top), height);
     
-    if (offset > 0)
+    if (offset >= 0)
         [self handleBottomBounceOffset:offset];
     else
         self.brc_context.refreshed = NO;
