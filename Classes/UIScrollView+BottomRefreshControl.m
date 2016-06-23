@@ -259,6 +259,7 @@ const CGFloat kMinRefershTime = 0.5;
         
         UITableView *tableView = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
         tableView.userInteractionEnabled = NO;
+        tableView.scrollsToTop           = NO;
         tableView.backgroundColor = [UIColor clearColor];
         tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 
